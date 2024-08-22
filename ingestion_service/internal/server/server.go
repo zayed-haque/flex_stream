@@ -29,7 +29,7 @@ func NewIngestServer(bootstrapServers string, topic string) (*IngestServer, erro
         return nil, fmt.Errorf("failed to create Kafka producer: %w", err)
     }
 
-    // Start a goroutine to handle delivery reports
+    //goroutine to handle delivery reports
     go func() {
         for e := range p.Events() {
             switch ev := e.(type) {
