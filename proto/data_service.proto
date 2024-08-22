@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package flexstream;
+
+option go_package = "github.com/zayed_haque/flex_stream/proto";
+
+// DataIngestion service handles incoming data
+service DataIngestion {
+  rpc SendData (DataPayload) returns (Response) {}
+}
+
+// DataAPI service provides access to processed data
+service DataAPI {
+  rpc GetProcessedData (DataRequest) returns (ProcessedData) {}
+}
+
+// DataPayload represents the incoming data
+message DataPayload {
+  string id = 1;
+  string data_type = 2;
+  bytes data = 3;
+  int64 timestamp = 4;
+}
+
+// Response is a generic response message
+message Response {
+  bool success = 1;
+  string message = 2;
+}
+
+// DataRequest is used to request processed data
+message DataRequest {
+  string id = 1;
+}
+
+// ProcessedData represents the processed data
+message ProcessedData {
+  string id = 1;
+  string data_type = 2;
+  bytes data = 3;
+  int64 processed_timestamp = 4;
+}
