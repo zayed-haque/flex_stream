@@ -40,3 +40,12 @@ message ProcessedData {
   bytes data = 3;
   int64 processed_timestamp = 4;
 }
+
+message TokenRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message TokenResponse {
+  string token = 1;
+}

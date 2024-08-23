@@ -19,7 +19,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	ingestServer, err := server.NewIngestServer()
+	ingestServer, err := server.NewIngestServer("redpanda:29092", "raw_data")
 	if err != nil {
 		log.Fatalf("failed to create ingest server: %v", err)
 	}

@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  redpanda:
+    image: vectorized/redpanda:latest
+    command:
+      - redpanda start
+      - --smp 1
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: flexstream
+      POSTGRES_USER: flexuser
+      POSTGRES_PASSWORD: flexpass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  ingestion-service:
+    build: ./ingestion_service
+    depends_on:
+      - redpanda
+    ports:
+      - "50051:50051"
+
+  processing-service:
+    build: ./processing_service
+    depends_on:
+      - redpanda
+      - postgres
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - POSTGRES_DB=flexstream
+      - POSTGRES_USER=flexuser
+      - POSTGRES_PASSWORD=flexpass
+
+  api-service:
+    build: ./api_service
+    depends_on:
+      - postgres
+    ports:
+      - "50052:50052"
+    environment:
+      - POSTGRES_DB=flexstream
+      - POSTGRES_USER=flexuser
+      - POSTGRES_PASSWORD=flexpass
+
+volumes:
+  postgres_data:

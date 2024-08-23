@@ -1,0 +1,5 @@
+quix-streams
+confluent-kafka
+google-generativeai
+python-dotenv
+psycopg2-binary
