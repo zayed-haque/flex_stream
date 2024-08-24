@@ -12,6 +12,7 @@ service DataIngestion {
 // DataAPI service provides access to processed data
 service DataAPI {
   rpc GetProcessedData (DataRequest) returns (ProcessedData) {}
+  rpc GenerateToken (TokenRequest) returns (TokenResponse) {}
 }
 
 // DataPayload represents the incoming data

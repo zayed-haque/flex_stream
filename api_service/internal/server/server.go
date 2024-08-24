@@ -30,15 +30,16 @@ func NewAPIServer() (*APIServer, error) {
 
 func (s *APIServer) GetProcessedData(ctx context.Context, req *pb.DataRequest) (*pb.ProcessedData, error) {
 	// Validate the token
-	claims, err := auth.ValidateToken(ctx)
+	_, err := auth.ValidateToken(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token: %v", err)
 	}
+
 	var id, dataType string
 	var processedResult []byte
 	var timestamp time.Time
 
-	err := s.db.QueryRowContext(ctx, `
+	err = s.db.QueryRowContext(ctx, `
         SELECT original_id, data_type, processed_result, timestamp
         FROM processed_data
         WHERE original_id = $1
@@ -61,13 +62,12 @@ func (s *APIServer) GetProcessedData(ctx context.Context, req *pb.DataRequest) (
 }
 
 func (s *APIServer) GenerateToken(ctx context.Context, req *pb.TokenRequest) (*pb.TokenResponse, error) {
-    token, err := auth.GenerateToken(req.Username)
-    if err != nil {
-        return nil, status.Errorf(codes.Internal, "could not generate token: %v", err)
-    }
-    return &pb.TokenResponse{Token: token}, nil
+	token, err := auth.GenerateToken(req.Username)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "could not generate token: %v", err)
+	}
+	return &pb.TokenResponse{Token: token}, nil
 }
-
 
 func (s *APIServer) Close() {
 	s.db.Close()

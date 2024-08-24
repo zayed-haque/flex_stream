@@ -126,6 +126,7 @@ var DataIngestion_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	DataAPI_GetProcessedData_FullMethodName = "/flexstream.DataAPI/GetProcessedData"
+	DataAPI_GenerateToken_FullMethodName    = "/flexstream.DataAPI/GenerateToken"
 )
 
 // DataAPIClient is the client API for DataAPI service.
@@ -135,6 +136,7 @@ const (
 // DataAPI service provides access to processed data
 type DataAPIClient interface {
 	GetProcessedData(ctx context.Context, in *DataRequest, opts ...grpc.CallOption) (*ProcessedData, error)
+	GenerateToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenResponse, error)
 }
 
 type dataAPIClient struct {
@@ -155,6 +157,16 @@ func (c *dataAPIClient) GetProcessedData(ctx context.Context, in *DataRequest, o
 	return out, nil
 }
 
+func (c *dataAPIClient) GenerateToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TokenResponse)
+	err := c.cc.Invoke(ctx, DataAPI_GenerateToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DataAPIServer is the server API for DataAPI service.
 // All implementations must embed UnimplementedDataAPIServer
 // for forward compatibility.
@@ -162,6 +174,7 @@ func (c *dataAPIClient) GetProcessedData(ctx context.Context, in *DataRequest, o
 // DataAPI service provides access to processed data
 type DataAPIServer interface {
 	GetProcessedData(context.Context, *DataRequest) (*ProcessedData, error)
+	GenerateToken(context.Context, *TokenRequest) (*TokenResponse, error)
 	mustEmbedUnimplementedDataAPIServer()
 }
 
@@ -174,6 +187,9 @@ type UnimplementedDataAPIServer struct{}
 
 func (UnimplementedDataAPIServer) GetProcessedData(context.Context, *DataRequest) (*ProcessedData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProcessedData not implemented")
+}
+func (UnimplementedDataAPIServer) GenerateToken(context.Context, *TokenRequest) (*TokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateToken not implemented")
 }
 func (UnimplementedDataAPIServer) mustEmbedUnimplementedDataAPIServer() {}
 func (UnimplementedDataAPIServer) testEmbeddedByValue()                 {}
@@ -214,6 +230,24 @@ func _DataAPI_GetProcessedData_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataAPI_GenerateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataAPIServer).GenerateToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataAPI_GenerateToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataAPIServer).GenerateToken(ctx, req.(*TokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DataAPI_ServiceDesc is the grpc.ServiceDesc for DataAPI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -224,6 +258,10 @@ var DataAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProcessedData",
 			Handler:    _DataAPI_GetProcessedData_Handler,
+		},
+		{
+			MethodName: "GenerateToken",
+			Handler:    _DataAPI_GenerateToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

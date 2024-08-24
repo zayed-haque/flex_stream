@@ -3,3 +3,8 @@ confluent-kafka
 google-generativeai
 python-dotenv
 psycopg2-binary
+schedule
+scikit-learn
+joblib
+sqlalchemy
+pandas
